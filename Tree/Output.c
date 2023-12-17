@@ -32,6 +32,8 @@ TreeErrorCode tree_cmd_dump(Tree* tree)
 
 static TreeErrorCode tree_cmd_dump_(Node* node, node_dump_cmd dump_cmd, int dep)
 {
+    if (!node) return TREE_ERROR_NO;
+
     if (node->left) tree_cmd_dump_(node->left, dump_cmd, dep + 1);
 
     for (int i = 0; i < dep; i++) fprintf(stderr, "\t");
@@ -127,6 +129,8 @@ TreeErrorCode tree_svg_dump(Tree* tree)
 
 static TreeErrorCode tree_svg_dump_make_node(Node* node, node_dump_svg dump_svg, char** output_buffer)
 {
+    if (!node) return TREE_ERROR_NO;
+
     if (node->left) tree_svg_dump_make_node(node->left, dump_svg, output_buffer);
 
     *output_buffer += sprintf(*output_buffer, "\t{ \n"
@@ -144,6 +148,8 @@ static TreeErrorCode tree_svg_dump_make_node(Node* node, node_dump_svg dump_svg,
 
 static TreeErrorCode tree_svg_dump_make_edge(Node* node, char** output_buffer)
 {
+    if (!node) return TREE_ERROR_NO;
+    
     if (node->left)  tree_svg_dump_make_edge(node->left, output_buffer);
 
     if (node->left)  

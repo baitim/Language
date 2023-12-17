@@ -1,6 +1,8 @@
 #ifndef TREE_TREE_H
 #define TREE_TREE_H
 
+#include <stdio.h>
+
 #include "Errors.h"
 
 typedef struct _Node {
@@ -16,10 +18,10 @@ typedef struct _OutputInfo {
     size_t number_html_dump;
 } OutputInfo;
 
-typedef void (*node_destroy) (void* data);
-typedef int  (*node_verify)  (const void* data);
-typedef void (*node_dump_cmd)(const void* data);
-typedef void (*node_dump_svg)(const void* data, char** output_buffer);
+typedef int (*node_destroy) (void* data);
+typedef int (*node_verify)  (const void* data);
+typedef int (*node_dump_cmd)(const void* data);
+typedef int (*node_dump_svg)(const void* data, char** output_buffer);
 
 typedef struct _Tree {
     char* name;

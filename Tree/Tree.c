@@ -14,46 +14,11 @@ enum TypeNodeColor {
 static TreeErrorCode subtree_destroy(Node* node, node_destroy destroy);
 static TreeErrorCode subtree_verify (Node* node, node_verify node_verify, int* color, int num);
 
-static TreeErrorCode subtree_insert(Node** node, int x, Node* parent);
-
-TreeErrorCode tree_insert(Tree* tree, int x)
-{
-    return subtree_insert(&tree->root, x, 0);
-}
-
-static TreeErrorCode subtree_insert(Node** node, int x, Node* parent)
-{
-    TreeErrorCode error = TREE_ERROR_NO;
-
-    if (!(*node)) {
-        *node = malloc(sizeof(Node));
-        if(!(*node)) return TREE_ERROR_ALLOC_FAIL;
-
-        **node = (Node){NULL, 1, NULL, NULL, parent};
-
-        (*node)->data = malloc(sizeof(int));
-        if(!(*node)->data) return TREE_ERROR_ALLOC_FAIL;
-        *(int*)(*node)->data = x;
-        
-        return TREE_ERROR_NO;
-    }
-    
-    if (x <= *(int*)(*node)->data)  error = subtree_insert(&(*node)->left,  x, *node);
-    else                            error = subtree_insert(&(*node)->right, x, *node);
-    if (error) return error;
-
-    size_t left_depth =  ((*node)->left)  ? (*node)->left->depth  : 0;
-    size_t right_depth = ((*node)->right) ? (*node)->right->depth : 0;
-    (*node)->depth = MAX(left_depth, right_depth) + 1;
-
-    return TREE_ERROR_NO;
-}
-
 TreeErrorCode tree_init(Tree** tree, char* name, node_destroy destroy, 
                         node_verify verify, node_dump_cmd dump_cmd,
                         node_dump_svg dump_svg)
 {
-    *tree = malloc(sizeof(Tree));
+    *tree = calloc(1, sizeof(Tree));
     if(!(*tree)) return TREE_ERROR_ALLOC_FAIL;
 
     **tree = (Tree){NULL, NULL, destroy, verify, dump_cmd, dump_svg, (OutputInfo){1, 1}};
@@ -79,6 +44,8 @@ TreeErrorCode tree_destroy(Tree* tree)
 
 static TreeErrorCode subtree_destroy(Node* node, node_destroy destroy)
 {
+    if (!node) return TREE_ERROR_NO;
+
     TreeErrorCode error = TREE_ERROR_NO;
 
     if (node->left)  error = subtree_destroy(node->left,  destroy);
@@ -87,7 +54,8 @@ static TreeErrorCode subtree_destroy(Node* node, node_destroy destroy)
     if (node->right) error = subtree_destroy(node->right, destroy);
     if (error) return error;
 
-    destroy(node->data);
+    int node_error = destroy(node->data);
+    if (node_error) return TREE_ERROR_NODE_DATA;
 
     free(node);
 

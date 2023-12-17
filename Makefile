@@ -14,17 +14,24 @@ OPTIONS = -D _DEBUG -ggdb3 -O0 -Wall -Wextra\
 -Itests -Isrc\
 -fsanitize=address,alignment,bool,bounds,enum,float-cast-overflow,float-divide-by-zero,integer-divide-by-zero,leak,nonnull-attribute,null,object-size,return,returns-nonnull-attribute,shift,signed-integer-overflow,undefined,unreachable,vla-bound,vptr
 
-INCLUDE_FILES = 	$(wildcard *.h) $(wildcard Errors/*.h) $(wildcard Tree/*.h)
+INCLUDE_FILES = 	$(wildcard *.h) $(wildcard Errors/*.h) $(wildcard Tree/*.h) $(wildcard Math/*.h) $(wildcard ProcessCmd/*.h)
 ERROR_FILES = 		$(wildcard Errors/*.c)
 TREE_FILES = 		$(wildcard Tree/*.c)
+MATH_FILES = 		$(wildcard Math/*.c)
+PROCESS_CMD_FILES = $(wildcard ProcessCmd/*.c)
 
 FRONTEND_FILES =			$(wildcard Frontend/*.c)
 FRONTEND_INCLUDE_FILES =	$(wildcard Frontend/*.h)
 
-start : build run
+ALL_FRONTEND_FILES = $(FRONTEND_FILES) $(ERROR_FILES) $(TREE_FILES) $(MATH_FILES) $(PROCESS_CMD_FILES)
+ALL_FRONTEND_INCLUDE_FILES = $(ALL_FRONTEND_FILES) $(INCLUDE_FILES)
 
-build : $(ERROR_FILES) $(TREE_FILES) $(INCLUDE_FILES) $(FRONTEND_FILES) $(FRONTEND_INCLUDE_FILES)
-	gcc $(ERROR_FILES) $(TREE_FILES) $(FRONTEND_FILES) -o frontend $(OPTIONS)
+FRONTEND_FLAGS = --name_data_file txt/program1
 
-run :
-	./frontend $(DATA_FILE)
+frontend_start : frontend_build frontend_run
+
+frontend_build : $(ERROR_FILES) $(TREE_FILES) $(INCLUDE_FILES) $(FRONTEND_FILES) $(FRONTEND_INCLUDE_FILES)
+	gcc $(ALL_FRONTEND_FILES) -o frontend $(OPTIONS)
+
+frontend_run :
+	./frontend $(FRONTEND_FLAGS) $(DATA_FILE)
