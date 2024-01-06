@@ -5,12 +5,14 @@
 #include <sys/types.h>
 
 #include "../ANSI_colors.h"
+#include "Declarators.h"
 #include "Input.h"
 #include "KeyWords.h"
 #include "Operators.h"
 #include "Separators.h"
 
-static FrontendErrorCode subtree_input      (TreeNode* node, Tokens* tokens, NameTable* name_table);
+static TreeNode* get_data(Tokens* tokens, NameTable* name_table, int* token_index, int* error);
+
 static FrontendErrorCode split_to_words     (FrontendInputData* input_data);
 
 static FrontendErrorCode check_type_arg     (char* str, TokenDataType* type_arg);
@@ -18,6 +20,7 @@ static FrontendErrorCode is_key_word        (char* str, int* is_id);
 static FrontendErrorCode is_number          (char* str, int* is_num);
 static FrontendErrorCode is_operator        (char* str, int* is_oper);
 static FrontendErrorCode is_separator       (char* str, int* is_sep);
+static FrontendErrorCode is_declarator      (char* str, int* is_dec);
 static FrontendErrorCode is_identifier      (char* str, int* is_id);
 
 static FrontendErrorCode write_token_value  (char* str, Token* token, NameTable* name_table);
@@ -25,6 +28,7 @@ static FrontendErrorCode write_key_word     (char* str, Token* token);
 static FrontendErrorCode write_number       (char* str, Token* token);
 static FrontendErrorCode write_operator     (char* str, Token* token);
 static FrontendErrorCode write_separator    (char* str, Token* token);
+static FrontendErrorCode write_declarator   (char* str, Token* token);
 static FrontendErrorCode write_identifier   (char* str, Token* token, NameTable* name_table);
 
 static FrontendErrorCode read_word          (char* buf, char* str);
@@ -38,15 +42,15 @@ FrontendErrorCode tree_input(Tree* tree, Tokens* tokens, NameTable* name_table)
 {
     if (!tree) return FRONTEND_ERROR_TREE_NULL;
 
-    FrontendErrorCode frontend_error = FRONTEND_ERROR_NO;
-
-    frontend_error = subtree_input(tree->root, tokens, name_table);
-    if (frontend_error) return frontend_error;
+    int error = 0;
+    int token_index = 0;
+    tree->root = get_data(tokens, name_table, &token_index, &error);
+    if (error) return error;
 
     return FRONTEND_ERROR_NO;
 }
 
-static FrontendErrorCode subtree_input(TreeNode* node, Tokens* tokens, NameTable* name_table)
+static TreeNode* get_data(Tokens* tokens, NameTable* name_table, int* token_index, int* error)
 {
     return FRONTEND_ERROR_NO;
 }
@@ -151,7 +155,7 @@ FrontendErrorCode tokenize(FrontendInputData* input_data, Tokens** tokens, NameT
 
         frontend_error = check_type_arg(word, &(*tokens)->token[i]->type);
         if (frontend_error) { 
-            fprintf(stderr, print_lred("cannot read word < %s >\n"), word);
+            fprintf(stderr, print_lred("cannot read word \"%s\"\n"), word);
             return frontend_error;
         }
 
@@ -243,6 +247,14 @@ static FrontendErrorCode check_type_arg(char* str, TokenDataType* type_arg)
         return FRONTEND_ERROR_NO;
     }
 
+    int is_dec = 0;
+    error = is_declarator(str, &is_dec);
+    if (error) return error;
+    if (is_dec) {
+        *type_arg = TYPE_DEC;
+        return FRONTEND_ERROR_NO;
+    }
+
     int is_id = 0;
     error = is_identifier(str, &is_id);
     if (error) return error;
@@ -315,6 +327,18 @@ static FrontendErrorCode is_separator(char* str, int* is_sep)
     return FRONTEND_ERROR_NO;
 }
 
+static FrontendErrorCode is_declarator(char* str, int* is_dec)
+{
+    for (int i = 0; i < COUNT_DECLARATORS; i++) {
+        if (strcmp(DECLARATORS[i].name, str) == 0) {
+            *is_dec = 1;
+            break;
+        }
+    }
+
+    return FRONTEND_ERROR_NO;
+}
+
 static FrontendErrorCode is_identifier(char* str, int* is_id)
 {
     int i = 0;
@@ -350,6 +374,7 @@ static FrontendErrorCode write_token_value(char* str, Token* token, NameTable* n
     if (token->type == TYPE_NUM) error = write_number    (str, token);
     if (token->type == TYPE_OP)  error = write_operator  (str, token);
     if (token->type == TYPE_SEP) error = write_separator (str, token);
+    if (token->type == TYPE_DEC) error = write_declarator(str, token);
     if (token->type == TYPE_ID)  error = write_identifier(str, token, name_table);
 
     if (error) return error;
@@ -393,6 +418,18 @@ static FrontendErrorCode write_separator(char* str, Token* token)
     for (int i = 0; i < COUNT_SEPARATORS; i++) {
         if (strcmp(SEPARATORS[i].name, str) == 0) {
             token->value = SEPARATORS[i].type_separator;
+            break;
+        }
+    }
+
+    return FRONTEND_ERROR_NO;
+}
+
+static FrontendErrorCode write_declarator(char* str, Token* token)
+{
+    for (int i = 0; i < COUNT_DECLARATORS; i++) {
+        if (strcmp(DECLARATORS[i].name, str) == 0) {
+            token->value = DECLARATORS[i].type_declarator;
             break;
         }
     }

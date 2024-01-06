@@ -9,7 +9,8 @@ typedef enum _TokenDataType {
     TYPE_NUM =  2,
     TYPE_OP  =  3,
     TYPE_SEP =  4,
-    TYPE_ID =   5
+    TYPE_DEC =  5,
+    TYPE_ID =   6
 } TokenDataType;
 
 typedef struct _Token {

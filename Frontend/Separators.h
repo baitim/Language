@@ -7,8 +7,10 @@ typedef enum _TypeSeparator {
     SEP_EXP_RIGHT =  1,
     SEP_STAT_LEFT = -2,
     SEP_STAT_RIGHT = 2,
-    SEP_END_LINE =   3,
-    SEP_END_STAT =   4
+    SEP_PAR_LEFT =  -3,
+    SEP_PAR_RIGHT =  3,
+    SEP_END_LINE =   4,
+    SEP_END_STAT =   5
 } TypeSeparator;
 
 typedef struct _Separator {
@@ -22,6 +24,8 @@ static const Separator SEPARATORS[] = {
     {SEP_EXP_RIGHT,     ")"},
     {SEP_STAT_LEFT,     "{"},
     {SEP_STAT_RIGHT,    "}"},
+    {SEP_PAR_LEFT,      "<"},
+    {SEP_PAR_RIGHT,     ">"},
     {SEP_END_LINE,      "end"},
     {SEP_END_STAT,      ":"}
 };

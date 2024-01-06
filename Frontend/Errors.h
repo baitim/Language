@@ -14,7 +14,8 @@ typedef enum _FrontendErrorCode {
     FRONTEND_ERROR_MAX_SIZE_WORD =      1 << 6,
     FRONTEND_ERROR_INVALID_WORD =       1 << 7,
     FRONTEND_ERROR_STRDUP =             1 << 8,
-    FRONTEND_ERROR_NAME_TABLE =         1 << 9
+    FRONTEND_ERROR_NAME_TABLE =         1 << 9,
+    FRONTEND_ERROR_SYNTAX_ERROR =       1 << 10
 } FrontendErrorCode;
 
 static const Error FRONTEND_ERRORS[] = {
@@ -28,7 +29,8 @@ static const Error FRONTEND_ERRORS[] = {
     {FRONTEND_ERROR_MAX_SIZE_WORD,      "word longer than available"},
     {FRONTEND_ERROR_INVALID_WORD,       "word was not read"},
     {FRONTEND_ERROR_STRDUP,             "strdup fail"},
-    {FRONTEND_ERROR_NAME_TABLE,         "name table fail"}
+    {FRONTEND_ERROR_NAME_TABLE,         "name table fail"},
+    {FRONTEND_ERROR_SYNTAX_ERROR,       "syntax error"}
 };
 static const int COUNT_FRONTEND_ERRORS = sizeof(FRONTEND_ERRORS) / sizeof(Error);
 

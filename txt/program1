@@ -1,14 +1,15 @@
-50 plus 3 end
+func main < >
+{
 
-( 4 minus -2 ) end
+    var r end
+    var x end
 
-{ t equal abcd }
+    if t more 4 : 
+        t plus 1000 end
+    else {
+        t minus 500 end
+        x assign 3 end
+    }
 
-if t more 4 : 
-    t plus 1000 end
-else
-    t minus 500
-
-xx more_equal ty end
-
-tt unequal 56 end
+    return 0 end
+}

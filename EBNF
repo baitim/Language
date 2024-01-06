@@ -1,9 +1,13 @@
-G ::= {BigStatement}
+Data ::= {Function}
 
-BigStatement = Statement | "{" {BigStatement} "}"
-Statement = Assign "end" | If | While
+Function ::= "func" Identifier "<" {Identifier} ">" PrisonerStatement
+
+BigStatement ::= Statement | PrisonerStatement
+PrisonerStatement = "{" {BigStatement} "}"
+Statement ::= Assign "end" | If | While | Return "end"
 
 Assign ::= ["declarate"] Identifier "assign" Expression
+Return ::= "return" Expression end
 
 If    ::= "if"    Expression ":" BigStatement ["else" BigStatement]
 While ::= "while" Expression ":" BigStatement
