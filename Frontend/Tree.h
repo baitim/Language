@@ -3,14 +3,32 @@
 
 #include "Errors.h"
 
-typedef struct _Tocken {
-    char* argument;
-} Tocken;
+typedef enum _TokenDataType {
+    TYPE_ERR = -1,
+    TYPE_NUM =  1,
+    TYPE_OP  =  2,
+    TYPE_SEP =  3,
+    TYPE_ID =   4
+} TokenDataType;
 
-FrontendErrorCode tocken_init   (Tocken** tocken);
-FrontendErrorCode tocken_delete (Tocken* tocken);
-FrontendErrorCode tocken_dump   (Tocken* tocken);
+typedef struct _Token {
+    int value;
+    TokenDataType type;
+} Token;
 
+typedef struct _Tokens {
+    Token** token;
+    size_t count_tokens;
+} Tokens;
+
+FrontendErrorCode token_init       (Token** token);
+FrontendErrorCode token_delete     (Token* token);
+FrontendErrorCode token_dump_cmd   (const Token* token);
+FrontendErrorCode token_dump_svg   (const Token* token, char** output_buffer);
+FrontendErrorCode token_verify     (const Token* token);
+FrontendErrorCode token_copy       (Token* dest_token, Token* src_token);
+
+int data_init     (void** data_dest, void* data_src);
 int data_destroy  (void* data);
 int data_verify   (const void* data);
 int data_dump_cmd (const void* data);

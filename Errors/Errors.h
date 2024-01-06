@@ -10,7 +10,8 @@ typedef enum _ErrorType {
     ERROR_CODE_NO =         0,
     ERROR_CODE_TREE =       1,
     ERROR_CODE_CMD =        2,
-    ERROR_CODE_FRONTEND =   3
+    ERROR_CODE_FRONTEND =   3,
+    ERROR_CODE_NAME_TABLE = 4
 } ErrorType;
 
 #define err_dump(error, type_error) err_dump_(error, type_error, __FILE__, __PRETTY_FUNCTION__, __LINE__) 

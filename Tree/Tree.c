@@ -6,22 +6,23 @@
 #include "Output.h"
 #include "Tree.h"
 
-enum TypeNodeColor {
+enum TypeTreeNodeColor {
     NODE_COLOR_WHITE = 0,
     NODE_COLOR_BLACK = 1,
 };
 
-static TreeErrorCode subtree_destroy(Node* node, node_destroy destroy);
-static TreeErrorCode subtree_verify (Node* node, node_verify node_verify, int* color, int num);
+static TreeErrorCode subtree_destroy(TreeNode* node, node_destroy destroy);
+static TreeErrorCode subtree_verify (TreeNode* node, node_verify node_verify, int* color, int num);
+static TreeErrorCode node_get_depth (TreeNode* node, size_t* depth);
 
-TreeErrorCode tree_init(Tree** tree, char* name, node_destroy destroy, 
-                        node_verify verify, node_dump_cmd dump_cmd,
-                        node_dump_svg dump_svg)
+TreeErrorCode tree_init(Tree** tree, char* name, node_init init,
+                        node_destroy destroy, node_verify verify,
+                        node_dump_cmd dump_cmd, node_dump_svg dump_svg)
 {
     *tree = calloc(1, sizeof(Tree));
     if(!(*tree)) return TREE_ERROR_ALLOC_FAIL;
 
-    **tree = (Tree){NULL, NULL, destroy, verify, dump_cmd, dump_svg, (OutputInfo){1, 1}};
+    **tree = (Tree){NULL, NULL, init, destroy, verify, dump_cmd, dump_svg, (OutputInfo){1, 1}};
 
     (*tree)->name = strdup(name);
     if (!(*tree)->name) return TREE_ERROR_ALLOC_FAIL;
@@ -42,7 +43,7 @@ TreeErrorCode tree_destroy(Tree* tree)
     return TREE_ERROR_NO;
 }
 
-static TreeErrorCode subtree_destroy(Node* node, node_destroy destroy)
+static TreeErrorCode subtree_destroy(TreeNode* node, node_destroy destroy)
 {
     if (!node) return TREE_ERROR_NO;
 
@@ -55,7 +56,7 @@ static TreeErrorCode subtree_destroy(Node* node, node_destroy destroy)
     if (error) return error;
 
     int node_error = destroy(node->data);
-    if (node_error) return TREE_ERROR_NODE_DATA;
+    if (node_error) return TREE_ERROR_TREE_NODE_DATA;
 
     free(node);
 
@@ -77,7 +78,7 @@ TreeErrorCode tree_verify(Tree* tree)
     return TREE_ERROR_NO;
 }
 
-static TreeErrorCode subtree_verify(Node* node, node_verify verify, int* color, int num)
+static TreeErrorCode subtree_verify(TreeNode* node, node_verify verify, int* color, int num)
 {
     if (!node) return TREE_ERROR_NO;
 
@@ -116,6 +117,46 @@ TreeErrorCode tree_dump(Tree* tree)
 
     error = tree_html_dump(tree);
     if (error) return error;
+
+    return TREE_ERROR_NO;
+}
+
+TreeNode* tree_node_init(Tree* tree, void* data,
+                         TreeNode* left, TreeNode* right, TreeNode* parent,
+                         TreeErrorCode* tree_error)
+{
+    TreeNode* node = calloc(1, sizeof(TreeNode));
+    if(!node) { 
+        *tree_error = TREE_ERROR_ALLOC_FAIL; 
+        return NULL; 
+    }
+
+    node->parent =   parent;
+    node->left =     left;
+    node->right =    right;
+
+    *tree_error = tree->node_init(&node->data, data);
+    if (*tree_error) return NULL; 
+
+    for (TreeNode* node_ = node; node_; node_ = node_->parent) {
+        *tree_error = node_get_depth(node_, &node_->depth);
+        if (*tree_error) return NULL;
+    }
+
+    if (node->left)  node->left->parent =  node;
+    if (node->right) node->right->parent = node;
+
+    *tree_error = TREE_ERROR_NO;
+    return NULL;
+}
+
+static TreeErrorCode node_get_depth(TreeNode* node, size_t* depth)
+{
+    size_t left_depth =  0;
+    size_t right_depth = 0;
+    if (node->left)  left_depth =  node->left->depth;
+    if (node->right) right_depth = node->right->depth;
+    (*depth) = MAX(left_depth, right_depth) + 1;
 
     return TREE_ERROR_NO;
 }

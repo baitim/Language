@@ -10,8 +10,11 @@ typedef enum _FrontendErrorCode {
     FRONTEND_ERROR_OPEN_FILE =          1 << 2,
     FRONTEND_ERROR_ALLOC_FAIL =         1 << 3,
     FRONTEND_ERROR_READ_FILE =          1 << 4,
-    FRONTEND_ERROR_MAX_COUNT_TOCKENS =  1 << 5,
-    FRONTEND_ERROR_MAX_SIZE_WORD =      1 << 6
+    FRONTEND_ERROR_MAX_COUNT_TOKENS =   1 << 5,
+    FRONTEND_ERROR_MAX_SIZE_WORD =      1 << 6,
+    FRONTEND_ERROR_INVALID_WORD =       1 << 7,
+    FRONTEND_ERROR_STRDUP =             1 << 8,
+    FRONTEND_ERROR_NAME_TABLE =         1 << 9
 } FrontendErrorCode;
 
 static const Error FRONTEND_ERRORS[] = {
@@ -21,8 +24,11 @@ static const Error FRONTEND_ERRORS[] = {
     {FRONTEND_ERROR_OPEN_FILE,          "open file"},
     {FRONTEND_ERROR_ALLOC_FAIL,         "alloc fail"},
     {FRONTEND_ERROR_READ_FILE,          "read file"},
-    {FRONTEND_ERROR_MAX_COUNT_TOCKENS,  "too many words are used"},
-    {FRONTEND_ERROR_MAX_SIZE_WORD,      "word longer than available"}
+    {FRONTEND_ERROR_MAX_COUNT_TOKENS,   "too many words are used"},
+    {FRONTEND_ERROR_MAX_SIZE_WORD,      "word longer than available"},
+    {FRONTEND_ERROR_INVALID_WORD,       "word was not read"},
+    {FRONTEND_ERROR_STRDUP,             "strdup fail"},
+    {FRONTEND_ERROR_NAME_TABLE,         "name table fail"}
 };
 static const int COUNT_FRONTEND_ERRORS = sizeof(FRONTEND_ERRORS) / sizeof(Error);
 

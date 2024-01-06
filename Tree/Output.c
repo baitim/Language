@@ -10,9 +10,9 @@
 #define MAX_SIZE_COMMAND        500
 #define MAX_SIZE_OUTPUT_BUFFER  100000
 
-static TreeErrorCode tree_cmd_dump_             (Node* node, node_dump_cmd dump_cmd, int dep);
-static TreeErrorCode tree_svg_dump_make_node    (Node* node, node_dump_svg dump_svg, char** output_buffer);
-static TreeErrorCode tree_svg_dump_make_edge    (Node* node, char** output_buffer);
+static TreeErrorCode tree_cmd_dump_             (TreeNode* node, node_dump_cmd dump_cmd, int dep);
+static TreeErrorCode tree_svg_dump_make_node    (TreeNode* node, node_dump_svg dump_svg, char** output_buffer);
+static TreeErrorCode tree_svg_dump_make_edge    (TreeNode* node, char** output_buffer);
 static TreeErrorCode str_attach                 (char* str1, const char *str2, char** new_str);
 
 TreeErrorCode tree_cmd_dump(Tree* tree)
@@ -30,7 +30,7 @@ TreeErrorCode tree_cmd_dump(Tree* tree)
     return tree_verify(tree);
 }
 
-static TreeErrorCode tree_cmd_dump_(Node* node, node_dump_cmd dump_cmd, int dep)
+static TreeErrorCode tree_cmd_dump_(TreeNode* node, node_dump_cmd dump_cmd, int dep)
 {
     if (!node) return TREE_ERROR_NO;
 
@@ -127,7 +127,7 @@ TreeErrorCode tree_svg_dump(Tree* tree)
     return tree_verify(tree);
 }
 
-static TreeErrorCode tree_svg_dump_make_node(Node* node, node_dump_svg dump_svg, char** output_buffer)
+static TreeErrorCode tree_svg_dump_make_node(TreeNode* node, node_dump_svg dump_svg, char** output_buffer)
 {
     if (!node) return TREE_ERROR_NO;
 
@@ -146,7 +146,7 @@ static TreeErrorCode tree_svg_dump_make_node(Node* node, node_dump_svg dump_svg,
     return TREE_ERROR_NO;
 }
 
-static TreeErrorCode tree_svg_dump_make_edge(Node* node, char** output_buffer)
+static TreeErrorCode tree_svg_dump_make_edge(TreeNode* node, char** output_buffer)
 {
     if (!node) return TREE_ERROR_NO;
     

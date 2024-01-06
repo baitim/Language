@@ -7,8 +7,8 @@ double clamp_double(double x, double min, double max)
 
 double my_pow(double x, double st)
 {
-    if (is_double_equal(st, (int)st))
-        return powf(x, (int)st);
+    if (is_double_equal(st, (int)st) && (int)st >= 0)
+        return fast_pow(x, (int)st);
     else
         return pow(x, st);
 }
@@ -16,8 +16,8 @@ double my_pow(double x, double st)
 double fast_pow(double x, int st)
 {
     if (st == 0) return 1;
-    if (st % 2 == 1) return x * powf(x, st - 1);
-    double z = powf(x, st / 2);
+    if (st % 2 == 1) return x * fast_pow(x, st - 1);
+    double z = fast_pow(x, st / 2);
     return z * z;
 }
 

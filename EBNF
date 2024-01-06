@@ -1,0 +1,14 @@
+G ::= {Assign}
+
+Assign ::= ["declarate"] Identifier "assign" Expression
+
+Expression  ::= Add {("less" | "less_equal" | "equal" | "unequal" | "more_equal" | "more")} Add
+Add         ::= Mul {(("plus" | "minus") Mul)}
+Mul         ::= Pow {(("multiply" | "divide") Pow)}
+Pow         ::= Operand {("**" Operand)}
+
+Operand     ::= "left" Expression "right" | Operand_
+Operand_ ::= Identifier | Number
+
+Identifier ::= {[A-Z] | [a-z] | "_"} {[A-Z] | [a-z] | "_" | [0-9]}
+Number ::= ["-"] [0-9]{[0-9]}
