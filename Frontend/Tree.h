@@ -5,10 +5,11 @@
 
 typedef enum _TokenDataType {
     TYPE_ERR = -1,
-    TYPE_NUM =  1,
-    TYPE_OP  =  2,
-    TYPE_SEP =  3,
-    TYPE_ID =   4
+    TYPE_KW =   1,
+    TYPE_NUM =  2,
+    TYPE_OP  =  3,
+    TYPE_SEP =  4,
+    TYPE_ID =   5
 } TokenDataType;
 
 typedef struct _Token {

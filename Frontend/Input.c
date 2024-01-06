@@ -4,7 +4,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#include "../ANSI_colors.h"
 #include "Input.h"
+#include "KeyWords.h"
 #include "Operators.h"
 #include "Separators.h"
 
@@ -12,12 +14,14 @@ static FrontendErrorCode subtree_input      (TreeNode* node, Tokens* tokens, Nam
 static FrontendErrorCode split_to_words     (FrontendInputData* input_data);
 
 static FrontendErrorCode check_type_arg     (char* str, TokenDataType* type_arg);
+static FrontendErrorCode is_key_word        (char* str, int* is_id);
 static FrontendErrorCode is_number          (char* str, int* is_num);
 static FrontendErrorCode is_operator        (char* str, int* is_oper);
 static FrontendErrorCode is_separator       (char* str, int* is_sep);
 static FrontendErrorCode is_identifier      (char* str, int* is_id);
 
 static FrontendErrorCode write_token_value  (char* str, Token* token, NameTable* name_table);
+static FrontendErrorCode write_key_word     (char* str, Token* token);
 static FrontendErrorCode write_number       (char* str, Token* token);
 static FrontendErrorCode write_operator     (char* str, Token* token);
 static FrontendErrorCode write_separator    (char* str, Token* token);
@@ -146,7 +150,10 @@ FrontendErrorCode tokenize(FrontendInputData* input_data, Tokens** tokens, NameT
         char* word = input_data->words[i];
 
         frontend_error = check_type_arg(word, &(*tokens)->token[i]->type);
-        if (frontend_error) return frontend_error;
+        if (frontend_error) { 
+            fprintf(stderr, print_lred("cannot read word < %s >\n"), word);
+            return frontend_error;
+        }
 
         frontend_error = write_token_value(word, (*tokens)->token[i], name_table);
         if (frontend_error) return frontend_error;
@@ -204,6 +211,14 @@ static FrontendErrorCode check_type_arg(char* str, TokenDataType* type_arg)
 {
     FrontendErrorCode error = FRONTEND_ERROR_NO;
 
+    int is_kw = 0;
+    error = is_key_word(str, &is_kw);
+    if (error) return error;
+    if (is_kw) {
+        *type_arg = TYPE_KW;
+        return FRONTEND_ERROR_NO;
+    }
+
     int is_num = 0;
     error = is_number(str, &is_num);
     if (error) return error;
@@ -238,6 +253,18 @@ static FrontendErrorCode check_type_arg(char* str, TokenDataType* type_arg)
 
     *type_arg = TYPE_ERR;
     return FRONTEND_ERROR_INVALID_WORD;
+}
+
+static FrontendErrorCode is_key_word(char* str, int* is_kw)
+{
+    for (int i = 0; i < COUNT_KEY_WORDS; i++) {
+        if (strcmp(KEY_WORDS[i].name, str) == 0) {
+            *is_kw = 1;
+            break;
+        }
+    }
+
+    return FRONTEND_ERROR_NO;
 }
 
 static FrontendErrorCode is_number(char* str, int* is_num)
@@ -319,12 +346,25 @@ static FrontendErrorCode write_token_value(char* str, Token* token, NameTable* n
 {
     FrontendErrorCode error = FRONTEND_ERROR_NO;
 
+    if (token->type == TYPE_KW)  error = write_key_word  (str, token);
     if (token->type == TYPE_NUM) error = write_number    (str, token);
     if (token->type == TYPE_OP)  error = write_operator  (str, token);
     if (token->type == TYPE_SEP) error = write_separator (str, token);
     if (token->type == TYPE_ID)  error = write_identifier(str, token, name_table);
 
     if (error) return error;
+
+    return FRONTEND_ERROR_NO;
+}
+
+static FrontendErrorCode write_key_word(char* str, Token* token)
+{
+    for (int i = 0; i < COUNT_KEY_WORDS; i++) {
+        if (strcmp(KEY_WORDS[i].name, str) == 0) {
+            token->value = KEY_WORDS[i].type_key_word;
+            break;
+        }
+    }
 
     return FRONTEND_ERROR_NO;
 }

@@ -1,13 +1,19 @@
-G ::= {Assign}
+G ::= {BigStatement}
+
+BigStatement = Statement | "{" {BigStatement} "}"
+Statement = Assign "end" | If | While
 
 Assign ::= ["declarate"] Identifier "assign" Expression
 
-Expression  ::= Add {("less" | "less_equal" | "equal" | "unequal" | "more_equal" | "more")} Add
-Add         ::= Mul {(("plus" | "minus") Mul)}
-Mul         ::= Pow {(("multiply" | "divide") Pow)}
-Pow         ::= Operand {("**" Operand)}
+If    ::= "if"    Expression ":" BigStatement ["else" BigStatement]
+While ::= "while" Expression ":" BigStatement
 
-Operand     ::= "left" Expression "right" | Operand_
+Expression  ::= Add {"less" | "less_equal" | "equal" | "unequal" | "more_equal" | "more"} Add
+Add         ::= Mul {("plus" | "minus") Mul}
+Mul         ::= Pow {("multiply" | "divide") Pow}
+Pow         ::= Operand {"**" Operand}
+
+Operand     ::= "(" Expression ")" | Operand_
 Operand_ ::= Identifier | Number
 
 Identifier ::= {[A-Z] | [a-z] | "_"} {[A-Z] | [a-z] | "_" | [0-9]}
